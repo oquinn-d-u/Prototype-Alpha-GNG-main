@@ -1,0 +1,46 @@
+import http.client
+import json
+
+def get_access_token():
+    conn = http.client.HTTPConnection("192.168.3.18", 31002)
+    payload = json.dumps({
+        "client_id": "{client_id}",
+        "client_secret": "{client_secret}"
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    conn.request("POST", "/security/v1/token", payload, headers)
+    res = conn.getresponse()
+    data = res.read()
+    token_data = json.loads(data.decode("utf-8"))
+    access_token = token_data.get("access_token")
+    conn.close()
+    return access_token
+
+def invocation(access_token):
+    conn = http.client.HTTPConnection("192.168.3.18", 7999)
+    payload = json.dumps({
+        "device": {
+            "deviceId": {device_id}
+        },
+        "maxBitRate": 400,
+        "direction": "uplink",
+        "duration": 10000
+    })
+    headers = {
+        'Content-type': 'application/json',
+        'Authorization': f'Bearer {access_token}'
+    }
+    conn.request("POST", "/qos/v1/bandwidth", payload, headers)
+    res = conn.getresponse()
+    data = res.read()
+    print(data.decode("utf-8"))
+    conn.close()
+
+# Main execution
+access_token = get_access_token()
+if access_token:
+    invocation(access_token)
+else:
+    print("Failed to retrieve access token.")

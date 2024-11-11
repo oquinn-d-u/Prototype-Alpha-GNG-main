@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.cloudmersive.com/jsclient/cloudmersive-validate-client.js"></script>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>GNG1103 Group 9 Prototype A</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+        <!-- Simple line icons-->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.min.css" rel="stylesheet" />
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+
+        <!-- Import latest version of TF.js-->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    
+    <!-- Facemesh model import -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
+
+	<!-- Our code goes in here -->
+    <script src="facemeshsetup.js"></script>
+    </head>
+    <body id="page-top">
+        <!-- Navigation-->
+        <a class="menu-toggle rounded" href="#"><i class="fas fa-bars"></i></a>
+        <nav id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand"><a href="#page-top">Prototype A</a></li>
+                <li class="sidebar-nav-item"><a href="#page-top">Home</a></li>
+                <li class="sidebar-nav-item"><a href="#about">Map</a></li>
+                <li class="sidebar-nav-item"><a href="#features">Planned Features</a></li>
+                <li class="sidebar-nav-item"><a href="#portfolio">Github</a></li>
+               
+            </ul>
+        </nav>
+        <!-- Header-->
+        <header class="masthead d-flex align-items-center">
+            <div class="container px-4 px-lg-5 text-center">
+                <h2 class="mb-1">Image Analysis</h2>
+                <div class="container">
+                    <canvas style="width: 100%; filter: contrast(400%);" id="facecanvas"></canvas>
+                  </div>
+                
+                
+              
+                <!-- Video that handles the browser access to the camera. The transforms mirror the feed -->
+                <video autoplay muted hidden playsinline id="video"  style="
+                    -webkit-transform: scaleX(-1);
+                    transform: scaleX(-1);
+                    width: auto;
+                    height: auto;">
+                </video>
+                <h2 class="mb-5"><em>Click here for</em></h2>
+                <a class="btn btn-dark btn-xl"href="#about">Description</a>
+            </div>
+
+        </header>
+
+        
+
+         <!-- INTERACTABLE GOOGLE MAP-->
+         <script>
+            async function init() {
+              await customElements.whenDefined('gmp-map');
+      
+              const map = document.querySelector('gmp-map');
+              const marker = document.querySelector('gmp-advanced-marker');
+              const placePicker = document.querySelector('gmpx-place-picker');
+              const infowindow = new google.maps.InfoWindow();
+      
+              map.innerMap.setOptions({
+                mapTypeControl: false
+              });
+      
+              placePicker.addEventListener('gmpx-placechange', () => {
+                const place = placePicker.value;
+      
+                if (!place.location) {
+                  window.alert(
+                    "No details available for input: '" + place.name + "'"
+                  );
+                  infowindow.close();
+                  marker.position = null;
+                  return;
+                }
+      
+                if (place.viewport) {
+                  map.innerMap.fitBounds(place.viewport);
+                } else {
+                  map.center = place.location;
+                  map.zoom = 17;
+                }
+      
+                marker.position = place.location;
+                infowindow.setContent(
+                  `<strong>${place.displayName}</strong><br>
+                   <span>${place.formattedAddress}</span>
+                `);
+                infowindow.open(map.innerMap, marker);
+              });
+            }
+      
+            document.addEventListener('DOMContentLoaded', init);
+          </script>
+          <script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6">
+          </script>
+          <style>
+            html,
+            body {
+              height: 100%;
+              margin: 0;
+              padding: 0;
+            }
+      
+            .place-picker-container {
+              padding: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <gmpx-api-loader key="AIzaSyCuoV9BJwaPgpoAM_KL5BNc946CVK4sLxk" solution-channel="GMP_GE_mapsandplacesautocomplete_v1">
+          </gmpx-api-loader>
+          <gmp-map center="40.749933,-73.98633" zoom="13" map-id="DEMO_MAP_ID">
+            <div slot="control-block-start-inline-start" class="place-picker-container">
+              <gmpx-place-picker placeholder="Address"></gmpx-place-picker>
+            </div>
+            <gmp-advanced-marker></gmp-advanced-marker>
+          </gmp-map>
+        </body>
+
+        
+        <!-- About-->
+        <section class="content-section bg-light" id="about">
+            <div class="container px-4 px-lg-5 text-center">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-lg-10">
+                        <h2>Description:</h2>
+                        <p class="lead mb-5">
+                            Here will be a generated description of the image taken or text
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services-->
+        <section class="content-section bg-primary text-white text-center" id="features">
+            <div class="container px-4 px-lg-5">
+                <div class="content-section-heading">
+                    <h3 class="text-secondary mb-0">Planned Features</h3>
+                    <h2 class="mb-5">In the future</h2>
+                </div>
+                <div class="row gx-4 gx-lg-5">
+                    <div class="col-lg-3 col-md-6 mb-5 mb-lg-0">
+                        <span class="service-icon rounded-circle mx-auto mb-3"><i class="icon-screen-smartphone"></i></span>
+                        <h4><strong>Responsive</strong></h4>
+                        <p class="text-faded mb-0">Adaptive Design for multiple control methods</p>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-5 mb-lg-0">
+                        <span class="service-icon rounded-circle mx-auto mb-3"><i class="icon-pencil"></i></span>
+                        <h4><strong>Transcribing</strong></h4>
+                        <p class="text-faded mb-0">Ability to print text from an image</p>
+                    </div>
+                
+                </div>
+            </div>
+        </section>
+
+        <!--Cloudmersive API Check-->
+        <script>
+        var defaultClient = cloudmersiveValidateApiClient.ApiClient.instance;
+
+            // Configure API key authorization: Apikey
+            var Apikey = defaultClient.authentications['Apikey'];
+            Apikey.apiKey = "67463310-0686-4e47-b3b0-18eb6868bcc0"
+            
+            var api = new cloudmersiveValidateApiClient.DomainApi()
+            
+            var domain = "cloudmersive.com"; // {String} Domain name to check, for example \"cloudmersive.com\".  The input is a string so be sure to enclose it in double-quotes.
+            
+            
+            var callback = function (error, data, response) {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log('API called successfully. Returned data: ' + data);
+                }
+            };
+            
+            api.domainCheck(domain, callback);</script>
+
+            
+           
+
+        
+        <!--CLOUDMERSIVE IMAGE RECOGNITION-->
+        <script src="https://cdn.cloudmersive.com/jsclient/cloudmersive-image-client.js">
+        var defaultClient = cloudmersiveImageApiClient.ApiClient.instance;
+        
+            // Configure API key authorization: Apikey
+            var Apikey = defaultClient.authentications['Apikey'];
+            Apikey.apiKey = "67463310-0686-4e47-b3b0-18eb6868bcc0"
+            
+            var api = new cloudmersiveImageApiClient.FaceApi()
+            
+            var imageBytes = fs.readFileSync('C:\Users\Derek\Code-repository\Prototype Alpha-GNG\assets\img\bigman.png');
+            
+            var callback = function (error, data, response) {
+                if (error) {
+                    console.error(error);
+                    res.end('Error\n');
+                } else {
+                    console.log('API called successfully.');
+            
+                    res.writeHead(200, { 'Content-Type': 'image/png' });
+                    res.end(data, 'binary');
+            
+                    
+                }
+            };
+     
+     api.faceCropFirst( Buffer.from(imageBytes.buffer), callback);
+    
+    
+                var form = new FormData();
+            form.append("imageFile", fileInput.files[0], "file");
+
+            var settings = {
+                "url": "https://api.cloudmersive.com/image/recognize/describe",
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "multipart/form-data",
+                    "Apikey": "YOUR-API-KEY-HERE"
+                },
+                "processData": false,
+                "mimeType": "multipart/form-data",
+                "contentType": false,
+                "data": form
+            };
+
+            $.ajax(settings).done(function (response) {
+                console.log(response);
+            });
+         </script>
+
+
+<style>
+    body{
+       
+        font-family: sans-serif;
+    }
+    .container{
+        margin-top: 50px;
+    }
+    
+    .bottom{
+        margin-top: 30px;
+        display: flex;
+    }
+    .bottom div{
+        flex: 1;
+        border: 1px solid rgb(118, 118, 118);
+        height: 400px;
+        margin: 10px;
+    }
+    .bottom div img{
+        max-width: calc(100% - 20px);
+        max-height: calc(100% - 20px);
+        margin: 10px;
+    }
+    .bottom div textarea{
+        resize: none;
+        width: calc(100% - 21px);
+        height: calc(100% - 21px);
+        padding: 10px;
+        font-size: 20px;
+        outline: none;
+        border: none;
+    }
+    .bottom div:first-child{
+        margin-left: 0px;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        display: -webkit-box;
+    }
+    .bottom div:last-child{
+        margin-right: 0px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="upper">
+        <input class="btn btn-secondary btn-xl" type="file">
+        <button class="btn btn-dark btn-xl">Start</button>
+        <div class="progress"></div>
+    </div>
+    <div class="bottom">
+        <div>
+            <img src="">
+        </div>
+        <div>
+            <textarea placeholder="Plaintext of image will appear here"></textarea>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/tesseract.js@v2.0.0-alpha.13/dist/tesseract.min.js"></script>
+<script src="script.js"></script>
+
+   
+        <!-- Footer-->
+        <footer class="footer text-center">
+            <div class="container px-4 px-lg-5">
+                <ul class="list-inline mb-5">
+                    <li class="list-inline-item">
+                        <a class="social-link rounded-circle text-white mr-3" href="#!"><i class="icon-social-linkedin"></i></a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="social-link rounded-circle text-white mr-3" href="#!"><i class="icon-social-twitter"></i></a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="social-link rounded-circle text-white" href="https://github.com/oquinn-d-u/Prototype-Alpha-GNG"><i class="icon-social-github"></i></a>
+                    </li>
+                </ul>
+                <p class="text-muted small mb-0">Copyright &copy; Group Nine: GNG1103</p>
+            </div>
+        </footer>
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+    </body>
+</html>
